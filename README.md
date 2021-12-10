@@ -1,7 +1,7 @@
 # cellular_automata
 Basic Cellular Automata.
 
-![rule 30](rule30_200x500.png "Rule 30")
+![rule 30](example_rule30.png "Rule 30")
 
 ## Setup
     python -m venv .venv
