@@ -1,6 +1,8 @@
 # cellular_automata
 Basic Cellular Automata.
 
+![rule 30](rule30_200x500.png "Rule 30")
+
 ## Setup
     python -m venv .venv
     source .venv/bin/activate
