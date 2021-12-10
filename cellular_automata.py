@@ -27,8 +27,8 @@ class CellularAutomata:
             self.ca_matrix.append(
                 np.array(
                     [
-                        self.next_by_rule(
-                            self.prev_as_str(i, self.ca_matrix[j]), self.rule
+                        self._next_by_rule(
+                            self._prev_as_str(i, self.ca_matrix[j]), self.rule
                         )
                         for i in range(self.width)
                     ]
@@ -36,27 +36,24 @@ class CellularAutomata:
             )
 
         self.ca_matrix_rgb = [
-            [(self.to_rgb(p * 255)) for p in row] for row in self.ca_matrix
+            [(self._to_rgb(p * 255)) for p in row] for row in self.ca_matrix
         ]
         self.ca_matrix_rgb = np.array(self.ca_matrix_rgb, dtype=np.uint8)
 
-    def save(self, name):
+    def save(self, name=None):
+        if not name:
+            name = f"rule{self.rule}_{self.height}x{self.width}"
         img = Image.fromarray(self.ca_matrix_rgb)
         img.save(f"{name}.png")
 
-    def prev_as_str(self, index, array):
+    def _prev_as_str(self, index, array):
         indices = [index - 1, index, (index + 1) % len(array)]
         return "".join(map(str, array[indices]))
 
-    def next_by_rule(self, prev: str, rule: int):
+    def _next_by_rule(self, prev: str, rule: int):
         rule_conf = "{0:08b}".format(rule)
         index = 7 - int(prev, 2)
         return int(rule_conf[index])
 
-    def to_rgb(self, val):
+    def _to_rgb(self, val):
         return (val, val, val)
-
-
-ca = CellularAutomata(30, 500, 255)
-ca.create()
-ca.save("rule30_50")
