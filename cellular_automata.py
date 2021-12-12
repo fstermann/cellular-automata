@@ -1,3 +1,5 @@
+from enum import Enum
+
 import numpy as np
 from PIL import Image
 
@@ -15,13 +17,26 @@ class CellularAutomata:
     ca_matrix = None
     ca_matrix_rgb = None
 
-    def __init__(self, rule, height, width):
+    class StartState(Enum):
+        CLASSIC = "cls"
+        RANDOM = "rnd"
+
+    start_state: StartState = StartState.CLASSIC
+
+    def __init__(
+        self,
+        rule: int,
+        height: int,
+        width: int,
+        start_state: StartState = StartState.CLASSIC,
+    ):
         self.rule = rule
         self.height = height
         self.width = width
+        self.start_state = start_state
 
     def create(self):
-        self.ca_matrix = [np.random.randint(0, 2, self.width)]
+        self.ca_matrix = self._get_initial_state()
 
         for j in range(self.height - 1):
             self.ca_matrix.append(
@@ -36,13 +51,23 @@ class CellularAutomata:
             )
 
         self.ca_matrix_rgb = [
-            [(self._to_rgb(p * 255)) for p in row] for row in self.ca_matrix
+            [(self._to_rgb(p)) for p in row] for row in self.ca_matrix
         ]
         self.ca_matrix_rgb = np.array(self.ca_matrix_rgb, dtype=np.uint8)
 
+    def _get_initial_state(self):
+        if self.start_state == self.StartState.CLASSIC:
+            initial_state = np.zeros(self.width, dtype=int)
+            initial_state[int(self.width / 2)] = 1
+            return [initial_state]
+        if self.start_state == self.StartState.RANDOM:
+            return [np.random.randint(0, 2, self.width)]
+
     def save(self, name=None):
         if not name:
-            name = f"rule{self.rule}_{self.height}x{self.width}"
+            name = (
+                f"rule{self.rule}_{self.start_state.value}_{self.height}x{self.width}"
+            )
         img = Image.fromarray(self.ca_matrix_rgb)
         img.save(f"{name}.png")
 
@@ -56,4 +81,6 @@ class CellularAutomata:
         return int(rule_conf[index])
 
     def _to_rgb(self, val):
-        return (val, val, val)
+        if val == 0:
+            return (255, 255, 255)
+        return (0, 0, 0)
